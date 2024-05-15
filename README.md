@@ -1,4 +1,4 @@
-# HerbAutomaticAbstractor
+# HerbAutomaticAbstraction
 ## Shortening Synthesized Programs using Common Subprograms in Solutions to Simpler Problems
 
 This project depends on
