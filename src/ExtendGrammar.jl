@@ -1,4 +1,4 @@
-using HerbGrammar: AbstractGrammar, rulenode2expr
+using HerbGrammar: AbstractGrammar, rulenode2expr, add_rule!
 using HerbSpecification
 using HerbSearch: synth, ProgramIterator, BFSIterator
 using StatsBase: sample
@@ -34,34 +34,76 @@ function split_examples(examples::Vector{IOExample}, spans::Spans)
     for count in spans.counts
         current_end = current_start + count
         task = examples[current_start:(current_end - 1)]
-        print("Task: ")
-        println(task)
         push!(result, task)
         current_start = current_end
     end
     return result
 end
 
+"""Run a divide-and-conquer algorithm on the examples to find common parts produced for them.
+
+  - `iterator_provider`: a function which takes a vector of examples and returns a program iterator for solving the subproblems.
+  - `min_utility`: min number of occurrences of a subprogram out of all in order to not filter it out during the merge phase
+  - `min_size`: minimum size of subprograms to include (using the length(rule_node) function)
+  - `splitting_strategy`: an instance of `ProblemSplittingStrategy` which will be used to split the provided examples
+"""
+function find_extensions(examples::Vector{IOExample}, g::AbstractGrammar, sym::Symbol;
+    iterator_provider::Function,
+    min_utility=0.0,
+    min_size::Int64=nothing,
+    splitting_strategy=RandomPick(length(examples) ÷ 3, nothing),
+    mod=Main
+    )::Tuple{Int64, Dict{RuleNode, Int64}}
+    problems = split_examples(examples, splitting_strategy)
+    # len_problems = length(problems)
+    # println("$len_problems problems to be solved.")
+    programs = map(function(p) 
+      # println("Solving problem...")
+      iterator = iterator_provider(p)
+      solution, _ = synth(Problem(p), iterator, allow_evaluation_errors=true, mod=mod)
+      # println(rulenode2expr(solution, g))
+      return solution
+    end, problems)
+    return hash_common_subcomponents(programs; min_utility=min_utility, min_size=min_size)
+end
+
+"""Produce a new grammar which can be used to synthesize new programs with a lesser search depth than before.
+
+ - `iterator_provider`: a function which takes a vector of examples and returns a program iterator for solving the subproblems.
+ - `min_utility`: min number of occurrences of a subprogram out of all in order to not filter it out during the merge phase
+ - `min_size`: minimum size of subprograms to include (using the length(rule_node) function)
+ - `splitting_strategy`: an instance of `ProblemSplittingStrategy` which will be used to split the provided examples
+ - `max_new_rules`: if you want to limit the new rules being added. More often used and larger rules are prioritized.
+ - `in_place`: whether you want the original grammar object to be modified instead of a copy of it."""
 function extend_grammar(examples::Vector{IOExample}, g::AbstractGrammar, sym::Symbol;
     iterator_provider::Function,
     min_utility=0.0,
-    max_new_rules=nothing,
-    splitting_strategy=RandomPick(length(examples) ÷ 3, nothing)
+    min_size::Int64=nothing,
+    splitting_strategy=RandomPick(length(examples) ÷ 3, nothing),
+    max_new_rules::Union{Int64, Nothing}=nothing,
+    in_place=false,
+    mod=Main
+    )::AbstractGrammar
+
+    (total_usages, usages) = find_extensions(examples, g, sym,
+        iterator_provider=iterator_provider,
+        min_utility=min_utility,
+        min_size=min_size,
+        splitting_strategy=splitting_strategy,
+        mod=mod
     )
-    problems = split_examples(examples, splitting_strategy)
-    len_problems = length(problems)
-    println("$len_problems problems to be solved.")
-    programs = map(function(p) 
-      println("Solving problem...")
-      iterator = iterator_provider(p)
-      solution, _ = synth(Problem(p), iterator, allow_evaluation_errors=true)
-      println(rulenode2expr(solution, g))
-      return solution
-    end, problems)
-    (my_count, usages) = hash_common_subcomponents(programs; min_utility=min_utility)
-    for prog in keys(usages)
-        print(usages[prog])
-        print(" times ")
-        println(rulenode2expr(prog, g))
+
+    new_g = if (in_place) g else deepcopy=(g) end
+
+    rules_added = 0
+    for ruleNode in keys(usages)
+        rules_added = rules_added + 1
+        if (!isnothing(max_new_rules) && rules_added == max_new_rules) break end
+        new_rule_type = g.types[ruleNode.ind]
+        new_rule_expr = rulenode2expr(ruleNode, g)
+        new_rule = Expr(:(=), new_rule_type, new_rule_expr)
+        add_rule!(g, new_rule)
     end
+
+    return new_g
 end

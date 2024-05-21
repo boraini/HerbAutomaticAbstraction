@@ -4,30 +4,45 @@ using HerbAutomaticAbstraction
 
 function listExample()
     g = @cfgrammar begin
-        Number = |(2:3)
-        Number = Number * Head
-        Head = List[0] # head
-        List = x
-        List = ((x, y) -> [x, y...])(Number, List) # cons
-        List = ((x) -> x[1:(lastindex(x))])(List) # tail
-        List = [] # nil
+        Number = |(2:3) # 0 1
+        Number = times(Number, Head) # 2
+        Head = head(List) # 3
+        List = x # 4 # input is expected to be a list for this example
+        List = cons(Number, List) # 5
+        List = tail(List) # 6
+        List = nil() # 7
+        List = cons(Head, List) # 8
     end
 
     examples = [
-        IOExample(Dict(:x => [2, 4, 10]), 12),
+        IOExample(Dict(:x => [2, 4, 10]), 12), # triple the second element
         IOExample(Dict(:x => [3, 5, 8]), 15),
         IOExample(Dict(:x => [2, 3, 4]), 9),
 
-        IOExample(Dict(:x => [2, 4, 10]), 8),
+        IOExample(Dict(:x => [2, 4, 10]), 8), # double the second element
         IOExample(Dict(:x => [3, 5, 8]), 10),
         IOExample(Dict(:x => [2, 3, 4]), 6)
     ]
 
     iterator_provider = problem -> DFSIterator(g, :Number, max_depth = 5)
 
-    """for prog in iterator_provider(nothing)
-        println(rulenode2expr(prog, g))
-    end"""
+    new_g = extend_grammar(examples, g, :Number, # expect to find head(tail(x)) as an extension
+        iterator_provider=iterator_provider,
+        splitting_strategy=Spans([3, 3]),
+        min_utility=0.3,
+        min_size=2,
+        mod=Lisp,
+    )
 
-    extend_grammar(examples, g, :Number, iterator_provider=iterator_provider, splitting_strategy=Spans([3, 3]), min_utility=0.1)
+    examples = [
+        IOExample(Dict(:x => [2, 4, 10]), [2, 4]), # double the second element
+        IOExample(Dict(:x => [3, 5, 8]), [3, 5]),
+        IOExample(Dict(:x => [2, 3, 4]), [2, 3])
+    ]
+
+    iterator = BFSIterator(new_g, :List, max_depth = 3)
+    
+    final_program, result = synth(Problem(examples), iterator, allow_evaluation_errors=true, mod=Lisp)
+
+    println(rulenode2expr(final_program, new_g))
 end
