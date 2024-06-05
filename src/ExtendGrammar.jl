@@ -3,6 +3,11 @@ using HerbSpecification
 using HerbSearch: synth, ProgramIterator, BFSIterator
 using StatsBase: sample
 
+export
+    extend_grammar,
+    find_extensions,
+    make_spans_strategy
+
 abstract type ProblemSplittingStrategy end
 
 """Draw random subsets of problems."""
@@ -14,10 +19,20 @@ end
 """Handle each example as a separate problem. Probably will always lead to overfitting the way it is implemented currently."""
 struct Each <: ProblemSplittingStrategy end
 
-"""If the counts list is [2, 3], take the first two items as one subproblem, and the next three as another. Works similar for other counts lists."""
+"""
+The recommended way of obtaining this, if possible, is to use the `make_spans_strategy(problems)` method.
+
+If the counts list is [2, 3], take the first two items as one subproblem, and the next three as another. Works similar for other counts lists.
+"""
 struct Spans <: ProblemSplittingStrategy
     counts::Vector{Int64}
 end
+
+"""
+Returns the concatenated array of IOExamples and the Spans splitting strategy description.
+"""
+make_spans_strategy(problems::Vector{Problem{Vector{IOExample}}})::Tuple{Vector{IOExample}, Spans} =
+    (reduce(vcat, map(p -> p.spec, problems)), Spans(reduce(vcat, map(p -> length(p.spec), problems))))
 
 function split_examples(examples::Vector{IOExample}, _::Each)
     return map(examples, e -> [e])
@@ -54,17 +69,23 @@ function find_extensions(examples::Vector{IOExample}, g::AbstractGrammar, sym::S
     splitting_strategy=RandomPick(length(examples) ÷ 3, nothing),
     mod=Main
     )::Tuple{Int64, Dict{RuleNode, Int64}}
-    problems = split_examples(examples, splitting_strategy)
+    problems = convert(Vector{Problem}, map(Problem, split_examples(examples, splitting_strategy)))
     # len_problems = length(problems)
     # println("$len_problems problems to be solved.")
-    programs = map(function(p) 
+    """programs = map(function(p) 
       # println("Solving problem...")
       iterator = iterator_provider(p)
       solution, _ = synth(Problem(p), iterator, allow_evaluation_errors=true, mod=mod)
       # println(rulenode2expr(solution, g))
       return solution
-    end, problems)
-    return hash_common_subcomponents(programs; min_utility=min_utility, min_size=min_size)
+    end, problems)"""
+
+    solutions = synth_multiple(problems, iterator_provider(problems[1].spec); allow_evaluation_errors=true, mod)
+
+    programs = map(p -> p[1], filter(p -> !isnothing(p), solutions))
+
+    # return hash_common_subcomponents(programs; min_utility=min_utility, min_size=min_size)
+    return hash_common_subcomponents_pairwise(g, programs; min_utility=min_utility, min_size=min_size)
 end
 
 """Produce a new grammar which can be used to synthesize new programs with a lesser search depth than before.
@@ -93,7 +114,7 @@ function extend_grammar(examples::Vector{IOExample}, g::AbstractGrammar, sym::Sy
         mod=mod
     )
 
-    new_g = if (in_place) g else deepcopy=(g) end
+    new_g = if (in_place) g else deepcopy(g) end
 
     rules_added = 0
     for ruleNode in keys(usages)
@@ -102,6 +123,7 @@ function extend_grammar(examples::Vector{IOExample}, g::AbstractGrammar, sym::Sy
         new_rule_type = g.types[ruleNode.ind]
         new_rule_expr = rulenode2expr(ruleNode, g)
         new_rule = Expr(:(=), new_rule_type, new_rule_expr)
+        println(new_rule)
         add_rule!(g, new_rule)
     end
 

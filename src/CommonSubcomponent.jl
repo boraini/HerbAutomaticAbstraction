@@ -1,4 +1,8 @@
-using Herb: RuleNode
+using Herb: RuleNode, AbstractGrammar, Hole
+export
+  Each,
+  RandomPick,
+  Spans
 
 """Call a function on each subprogram."""
 function visit_rulenode(n::RuleNode, f::Function)
@@ -64,4 +68,58 @@ function hash_common_subcomponents(nodes::Vector{RuleNode}, low = 1, high = leng
         , h)
         return (count, Dict(filtered))
     end
+end
+
+"""Get the most useful subcomponents and how often they are used according to a min utility value between 0 and 1"""
+function hash_common_subcomponents_pairwise(g::AbstractGrammar, nodes::Vector{RuleNode};
+    min_utility = 0.0,
+    min_size::Union{Int64, Nothing} = nothing,
+)
+    utilities = convert(Dict{RuleNode, Int64}, Dict())
+    total_utility = 0
+    for node1 in nodes
+        for node2 in nodes
+            if (node1 == node2) continue end
+
+            handle_pair(n1, n2) = begin
+                common = find_common_subtree_with_holes(g, n1, n2)
+
+                if (!isnothing(common) && (isnothing(min_size) || min_size <= length(common)))
+                    c = get(utilities, "common", 0)
+
+                    utilities[common] = c + 1
+                    total_utility += 1
+                end
+            end
+
+            visit_rulenode(node1, (v1) -> visit_rulenode(node2, (v2) -> handle_pair(v1, v2)))
+        end
+    end
+
+    return (total_utility, utilities)
+end
+
+"""Find the deepest subtree with holes that is common."""
+function find_common_subtree_with_holes(g::AbstractGrammar, node1::RuleNode, node2::RuleNode)::Union{RuleNode, Nothing}
+    if (node1.ind != node2.ind) return nothing end
+
+    # shallow copy is intended
+    common_tree = RuleNode(node1.ind, copy(node1.children))
+
+    for (i, (n1c, n2c)) in enumerate(zip(node1.children, node2.children))
+        if (g.types[n1c.ind] == g.types[n2c.ind])
+            common_subtree = find_common_subtree_with_holes(g, n1c, n2c)
+            if (isnothing(common_subtree))
+                # this will make it become the type when rulenode2expr is used
+                common_tree.children[i] = Hole([type == g.types[n1c.ind] for type in g.types])
+            else
+                # already cloned
+                common_tree.children[i] = common_subtree
+            end
+        else
+            return nothing
+        end
+    end
+
+    return common_tree
 end

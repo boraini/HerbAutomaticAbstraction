@@ -12,6 +12,8 @@ One of the ways to optimize this is to limit the search space, so the synthesize
 
 This creates the problem of not being able to solve overly complex specifications, because they would require a more complex program than the above limitation imposes. To allow a solution to such problems while keeping the limitation, one can provide the algorithm with more abstractions. This research explores ways of doing this automatically, via extending the program from common parts of the solutions to simpler problems, before tackling a complex problem.
 
+![Algorithm Block Diagram](synthesizer.svg)
+
 The following shows what the algoritm tries to do, and the expected result. It uses a grammar that could be the subset of a Lisp-like language's grammar (Racket?):
 
 ```

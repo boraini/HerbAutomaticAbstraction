@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="130mm"
+   height="40mm"
+   viewBox="0 0 130 40"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="synthesizer.svg"
+   inkscape:export-filename="synthesizer.pdf"
+   inkscape:export-xdpi="200"
+   inkscape:export-ydpi="200"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2.025849"
+     inkscape:cx="242.36752"
+     inkscape:cy="97.98361"
+     inkscape:window-width="1920"
+     inkscape:window-height="991"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <rect
+       x="304.36478"
+       y="289.34698"
+       width="83.421089"
+       height="73.76239"
+       id="rect5228" />
+    <rect
+       x="196.16171"
+       y="280.04944"
+       width="96.684692"
+       height="56.078182"
+       id="rect4664" />
+    <rect
+       x="197.20885"
+       y="278.26675"
+       width="73.996941"
+       height="85.913429"
+       id="rect4583" />
+    <rect
+       x="98.778946"
+       y="343.98105"
+       width="78.883537"
+       height="27.282223"
+       id="rect4559" />
+    <rect
+       x="103.31649"
+       y="270.95898"
+       width="101.83472"
+       height="32.707722"
+       id="rect4193" />
+    <rect
+       x="29.319544"
+       y="280.04944"
+       width="36.300388"
+       height="16.985476"
+       id="rect2212" />
+    <marker
+       style="overflow:visible"
+       id="marker1864"
+       refX="3"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1862" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleStart"
+       refX="3"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <rect
+       x="29.319544"
+       y="280.04944"
+       width="77.138329"
+       height="49.795441"
+       id="rect2212-5" />
+    <rect
+       x="29.319544"
+       y="280.04944"
+       width="36.300388"
+       height="16.985476"
+       id="rect2212-53" />
+    <marker
+       style="overflow:visible"
+       id="TriangleStart-7"
+       refX="3"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135-1" />
+    </marker>
+    <rect
+       x="29.319544"
+       y="280.04944"
+       width="36.300388"
+       height="16.985476"
+       id="rect2212-4" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-1.0046645,-65.806614)">
+    <rect
+       style="fill:#b3b3b3;stroke-width:12.304"
+       id="rect234"
+       width="20.871269"
+       height="14.86847"
+       x="31.861008"
+       y="71.368782" />
+    <rect
+       style="fill:#b3b3b3;stroke-width:12.304"
+       id="rect234-7"
+       width="20.871269"
+       height="14.86847"
+       x="31.861008"
+       y="88.453667" />
+    <rect
+       style="fill:#b3b3b3;stroke-width:10"
+       id="rect470"
+       width="25.119402"
+       height="31.953356"
+       x="55.410446"
+       y="71.368782" />
+    <rect
+       style="fill:#b3b3b3;stroke-width:10"
+       id="rect470-4"
+       width="25.119402"
+       height="31.953356"
+       x="83.208023"
+       y="71.368782" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.36547px;font-family:arial;-inkscape-font-specification:arial;fill:#b3b3b3;stroke-width:8.38159"
+       x="35.320354"
+       y="69.778389"
+       id="text526"><tspan
+         sodipodi:role="line"
+         id="tspan524"
+         style="font-size:2.36547px;fill:#000000;stroke-width:8.38159"
+         x="35.320354"
+         y="69.778389">Subproblems</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.36547px;font-family:arial;-inkscape-font-specification:arial;fill:#b3b3b3;stroke-width:8.38159"
+       x="57.411003"
+       y="69.764526"
+       id="text526-0"><tspan
+         sodipodi:role="line"
+         id="tspan524-0"
+         style="font-size:2.36547px;fill:#000000;stroke-width:8.38159"
+         x="57.411003"
+         y="69.764526">Subproblem Solving</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.36547px;font-family:arial;-inkscape-font-specification:arial;fill:#b3b3b3;stroke-width:8.38159"
+       x="83.528038"
+       y="69.764526"
+       id="text526-0-2"><tspan
+         sodipodi:role="line"
+         id="tspan524-0-5"
+         style="font-size:2.36547px;fill:#000000;stroke-width:8.38159"
+         x="83.528038"
+         y="69.764526">Common Subprograms</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1;marker-end:;marker-start:url(#marker1864)"
+       d="M 31.861007,77.18688 H 23.087686"
+       id="path857"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart)"
+       d="m 23.087686,98.24285 h 8.773321"
+       id="path1477" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart-7)"
+       d="m 108.32743,87.34546 h 8.77332"
+       id="path1477-1" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.499999;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2208"
+       width="10.897388"
+       height="6.6492538"
+       x="12.190298"
+       y="73.492851" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,6.3955379,0.90876383)"
+       id="text2210"
+       style="font-size:10.6667px;font-family:arial;-inkscape-font-specification:arial;white-space:pre;shape-inside:url(#rect2212);display:inline;fill:#000000;stroke:#000000;stroke-width:1.88976;stroke-dasharray:none;stroke-opacity:1"><tspan
+         x="29.320312"
+         y="289.65691"
+         id="tspan7780"><tspan
+           style="stroke:none"
+           id="tspan7778">Input</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,7.4883258,11.619518)"
+       id="text2210-4"
+       style="font-size:10.6667px;font-family:arial;-inkscape-font-specification:arial;white-space:pre;shape-inside:url(#rect2212-4);display:inline;fill:#000000;stroke:none;stroke-width:1.88976;stroke-dasharray:none;stroke-opacity:1"><tspan
+         x="29.320312"
+         y="289.65691"
+         id="tspan7782">OR</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.499999;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2208-1"
+       width="10.897388"
+       height="6.6492538"
+       x="117.13355"
+       y="84.020836" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,110.53061,11.45466)"
+       id="text2210-1"
+       style="font-size:10.6667px;font-family:arial;-inkscape-font-specification:arial;white-space:pre;shape-inside:url(#rect2212-53);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.88976;stroke-dasharray:none;stroke-opacity:1"><tspan
+         x="29.320312"
+         y="289.65691"
+         id="tspan7784">Output</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-dasharray:1.5, 0.5;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect2208-4"
+       width="15.857276"
+       height="7.1110134"
+       x="6.9804106"
+       y="94.352119" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,-0.00528613,21.142034)"
+       id="text2210-8"
+       style="font-size:8px;font-family:arial;-inkscape-font-specification:arial;white-space:pre;shape-inside:url(#rect2212-5);display:inline;fill:#000000;stroke:none;stroke-width:1.88976;stroke-dasharray:none;stroke-opacity:1"><tspan
+         x="29.320312"
+         y="287.25486"
+         id="tspan7786">Supplementary
+</tspan><tspan
+         x="29.320312"
+         y="297.25486"
+         id="tspan7788">Simpler Tasks</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,5.1712604,3.11953)"
+       id="text4191"
+       style="font-size:8px;font-family:arial;-inkscape-font-specification:arial;white-space:pre;shape-inside:url(#rect4193);display:inline;fill:#000000;stroke:none;stroke-width:1.88976;stroke-dasharray:5.66929, 1.88976;stroke-dashoffset:0;stroke-opacity:1"><tspan
+         x="103.31641"
+         y="278.16502"
+         id="tspan7790">Split Input Randomly
+</tspan><tspan
+         x="103.31641"
+         y="288.16502"
+         id="tspan7792">- Split Size
+</tspan><tspan
+         x="103.31641"
+         y="298.16502"
+         id="tspan7794">- Split Count</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,10.301697,2.4049845)"
+       id="text4557"
+       style="font-size:8px;font-family:arial;-inkscape-font-specification:arial;white-space:pre;shape-inside:url(#rect4559);display:inline;fill:#000000;stroke:none;stroke-width:1.88976;stroke-dasharray:5.66929, 1.88976;stroke-dashoffset:0;stroke-opacity:1"><tspan
+         x="98.779297"
+         y="351.1865"
+         id="tspan7796">Use Simpler </tspan><tspan
+         x="98.779297"
+         y="361.1865"
+         id="tspan7798">Problems</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text4581"
+       style="font-size:8px;font-family:arial;-inkscape-font-specification:arial;white-space:pre;shape-inside:url(#rect4583);display:inline;fill:#000000;stroke:none;stroke-width:1.88976;stroke-dasharray:5.66929, 1.88976;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,5.3228092,6.8258273)"
+       id="text4662"
+       style="font-size:8px;font-family:arial;-inkscape-font-specification:arial;white-space:pre;shape-inside:url(#rect4664);display:inline;fill:#000000;stroke:none;stroke-width:1.88976;stroke-dasharray:5.66929, 1.88976;stroke-dashoffset:0;stroke-opacity:1"><tspan
+         x="196.16211"
+         y="287.25486"
+         id="tspan7800">Subproblem Solver
+</tspan><tspan
+         x="196.16211"
+         y="297.25486"
+         id="tspan7802">- Iterator Type
+</tspan><tspan
+         x="196.16211"
+         y="307.25486"
+         id="tspan7804">
+</tspan><tspan
+         x="196.16211"
+         y="317.25486"
+         id="tspan7806">Limited Search Depth?</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,5.8915575,1.689455)"
+       id="text5226"
+       style="font-size:8px;font-family:arial;-inkscape-font-specification:arial;white-space:pre;shape-inside:url(#rect5228);display:inline;fill:#000000;stroke:none;stroke-width:1.88976;stroke-dasharray:5.66929, 1.88976;stroke-dashoffset:0;stroke-opacity:1"><tspan
+         x="304.36523"
+         y="296.55369"
+         id="tspan7808">Utility Function
+</tspan><tspan
+         x="304.36523"
+         y="306.55369"
+         id="tspan7810">- Program Length
+</tspan><tspan
+         x="304.36523"
+         y="316.55369"
+         id="tspan7812">- Frequency
+</tspan><tspan
+         x="304.36523"
+         y="326.55369"
+         id="tspan7814">
+</tspan><tspan
+         x="304.36523"
+         y="336.55369"
+         id="tspan7816">Equivalence
+</tspan><tspan
+         x="304.36523"
+         y="346.55369"
+         id="tspan7818">- Subtree only
+</tspan><tspan
+         x="304.36523"
+         y="356.55369"
+         id="tspan7820">- Subtree with holes</tspan></text>
+  </g>
+</svg>
