@@ -1,12 +1,11 @@
-using BenchmarkTools
 using HerbBenchmarks.PBE_SLIA_Track_2019
 using HerbConstraints
 using HerbSpecification
 using HerbSearch
 using HerbInterpret
 
-function solve(g, start_symbol, problems::Vector{Problem})
-    iterator = BFSIterator(g, :ntString, max_depth=5)
+function solve(iterator_to_use, problems::Vector{Problem})
+    iterator = iterator_to_use
     
     programs = synth_multiple(problems, iterator, allow_evaluation_errors=true, mod=PBE_SLIA_Track_2019)
 
@@ -20,12 +19,16 @@ function stringBenchmark()
         # ntString = ""
         ntStringDelim = " "
         ntStringDelim = "."
+        ntStringDelim = ","
         ntStringDelim = "-"
+        ntStringDelim = "_"
         ntStringDelim = "/"
         ntStringDelim = "= "
+        ntStringDelim = "<"
+        ntStringDelim = ">"
         ntString = substr_cvc(ntString, ntInt, ntInt)
         # ntString = concat_cvc(ntString, ntString)
-        # ntString = replace_cvc(ntString, ntString, ntString)
+        # ntString = replace_cvc(ntString, ntStringDelim, ntStringDelim)
         # ntString = at_cvc(ntString, ntInt)
         # ntString = int_to_str_cvc(ntInt)
         ntInt = -1
@@ -40,9 +43,9 @@ function stringBenchmark()
         # ntInt = ntBool ? ntInt : ntInt
         ntInt = indexof_cvc(ntString, ntStringDelim, ntInt)
         ntString = ntBool ? ntString : ntString
-        ntBool = true
-        ntBool = false
-        ntBool = ntInt == ntInt
+        #ntBool = true
+        #ntBool = false
+        ntBool = _arg_2 == ntInt
         # ntBool = prefixof_cvc(ntString, ntString)
         # ntBool = suffixof_cvc(ntString, ntString)
         ntBool = contains_cvc(ntString, ntStringDelim)
@@ -51,8 +54,8 @@ function stringBenchmark()
         ntStringDelim = ntString # this is just short circuited somehow
     end
 
-    ruleid_substr = 8
-    ruleid_plus = 13
+    ruleid_substr = 12
+    ruleid_plus = 17
 
     # do not chain substr_cvc
     # addconstraint!(g, Forbidden(
@@ -72,22 +75,29 @@ function stringBenchmark()
     # ))
 
     # do not chain substr_cvc
-    addconstraint!(g, Forbidden(
-        RuleNode(ruleid_substr, [
-            RuleNode(ruleid_substr, [VarNode(:a), VarNode(:b), VarNode(:c)])
-            VarNode(:d)
-            VarNode(:e)
-        ])
-    ))
+    # addconstraint!(g, Forbidden(
+    #     RuleNode(ruleid_substr, [
+    #         RuleNode(ruleid_substr, [VarNode(:a), VarNode(:b), VarNode(:c)])
+    #         VarNode(:d)
+    #         VarNode(:e)
+    #     ])
+    # ))
 
     # addconstraint!(g, ForbiddenSequence([ruleid_substr, ruleid_substr])) # do not nest substr_cvc
     addconstraint!(g, ForbiddenSequence([ruleid_plus, ruleid_plus])) # do not chain (+)
 
-    iterator_to_use = BFSIterator(g, :ntString, max_depth=5)
+    iterator_to_use = BFSIterator(g, :ntString, max_depth=10)
     iterator_init_state = deepcopy(iterator_to_use.solver.state)
 
     problems = [
         # PBE_SLIA_Track_2019.problem_36462127,
+        #PBE_SLIA_Track_2019.problem_extract_text_between_parentheses,
+        PBE_SLIA_Track_2019.problem_extract_word_that_begins_with_specific_character,
+        PBE_SLIA_Track_2019.problem_get_first_name_from_name_with_comma,
+        PBE_SLIA_Track_2019.problem_stackoverflow11,
+        PBE_SLIA_Track_2019.problem_replace_one_character_with_another,
+
+        # original working problems
         PBE_SLIA_Track_2019.problem_exceljet3,
         PBE_SLIA_Track_2019.problem_11604909, # substr_cvc(_arg_1, -1 + indexof_cvc(_arg_1, ".", 2), indexof_cvc(_arg_1, ".", 1) + 1)
         PBE_SLIA_Track_2019.problem_exceljet4 # substr_cvc(_arg_1, indexof_cvc(_arg_1, "/", -1) + 2, len_cvc(_arg_1))
@@ -100,9 +110,11 @@ function stringBenchmark()
     new_g = extend_grammar(examples, g, :ntString;
         iterator_provider=_ -> iterator_to_use,
         splitting_strategy,
-        min_utility=0.3,
+        min_utility=0.1,
         min_size=4,
+        max_new_rules=4,
         mod=PBE_SLIA_Track_2019,
+        max_enumerations=10_000_000,
         in_place=false
     )
 
@@ -110,11 +122,57 @@ function stringBenchmark()
 
     printstyled("Trying with the new grammar...\n"; color = :lime)
 
-    solve(new_g, :ntString, convert(Vector{Problem}, problems))
+    second_iterator_to_use = BFSIterator(new_g, :ntString, max_depth=5)
+    second_iterator_init_state = deepcopy(second_iterator_to_use.solver.state)
 
-    iterator_to_use.solver.state = deepcopy(iterator_init_state)
+    solve(second_iterator_to_use, convert(Vector{Problem}, problems))
+
+    second_iterator_to_use.solver.state = deepcopy(second_iterator_init_state)
 
     # TODO: delete this
+
+    # println(HerbInterpret.execute_on_input(
+    #     SymbolTable(g),
+    #     :(_arg_2 == 1 ? substr_cvc(_arg_1, indexof_cvc(_arg_1, ",", 0) + 1, len_cvc(_arg_1)) : substr_cvc(_arg_1, 1, indexof_cvc(_arg_1, ",", 0) + -1)),
+    #     Dict(
+    #         :_arg_1 => "chang,amy",
+    #         :_arg_2 => 1
+    #     )
+    # ))
+
+    # println("#$(HerbInterpret.execute_on_input(
+    #     SymbolTable(g),
+    #     :(
+    #         contains_cvc(
+    #             substr_cvc(
+    #                 _arg_1,
+    #                 indexof_cvc(_arg_1, "_", 0),
+    #                 len_cvc(_arg_1)), " ")
+    #         ? substr_cvc(
+    #             substr_cvc(
+    #                 _arg_1,
+    #                 indexof_cvc(_arg_1, "_", 0),
+    #                 len_cvc(_arg_1)
+    #             ),
+    #             1,
+    #             indexof_cvc(
+    #                 substr_cvc(
+    #                     _arg_1,
+    #                     indexof_cvc(
+    #                         _arg_1,
+    #                         "_",
+    #                         0
+    #                     ), len_cvc(_arg_1)
+    #                 ),
+    #                 " ",
+    #                 0
+    #             ) + -1
+    #         )
+    #         : substr_cvc(_arg_1, indexof_cvc(_arg_1, "_", 0), len_cvc(_arg_1))),
+    #     Dict(
+    #         :_arg_1 => "this is a _username in the middle",
+    #     )
+    # ))#")
 
     # val = substr_cvc(_arg_1, indexof_cvc(_arg_1, " ", 0) + 1, length_cvc(_arg_1))
 

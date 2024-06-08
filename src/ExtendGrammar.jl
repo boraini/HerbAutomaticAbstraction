@@ -6,6 +6,7 @@ using StatsBase: sample
 export
     extend_grammar,
     find_extensions,
+    choose_extensions,
     make_spans_strategy
 
 abstract type ProblemSplittingStrategy end
@@ -66,6 +67,7 @@ function find_extensions(examples::Vector{IOExample}, g::AbstractGrammar, sym::S
     iterator_provider::Function,
     min_utility=0.0,
     min_size::Int64=nothing,
+    max_enumerations::Int64=nothing,
     splitting_strategy=RandomPick(length(examples) ÷ 3, nothing),
     mod=Main
     )::Tuple{Int64, Dict{RuleNode, Int64}}
@@ -80,12 +82,46 @@ function find_extensions(examples::Vector{IOExample}, g::AbstractGrammar, sym::S
       return solution
     end, problems)"""
 
-    solutions = synth_multiple(problems, iterator_provider(problems[1].spec); allow_evaluation_errors=true, mod)
+    solutions = synth_multiple(problems, iterator_provider(problems[1].spec); allow_evaluation_errors=true, max_enumerations, mod)
 
     programs = map(p -> p[1], filter(p -> !isnothing(p), solutions))
 
     # return hash_common_subcomponents(programs; min_utility=min_utility, min_size=min_size)
     return hash_common_subcomponents_pairwise(g, programs; min_utility=min_utility, min_size=min_size)
+end
+
+"""
+Choose extensions to actually add to the grammar.
+"""
+function choose_extensions(count::Int64, usages::Dict{RuleNode, Int64};
+    min_utility=0.0,
+    max_new_rules=length(usages)
+    )::Vector{RuleNode}
+
+    threshold = min_utility * count
+
+    println("threshold is $(threshold)")
+
+    filtered = filter(((n, c),) ->
+          if (c < threshold)
+            count = count - c
+            false
+          else
+            true
+          end
+        , usages)
+
+    rules_to_use = collect(keys(filtered))
+
+    println(rules_to_use)
+
+    sort!(rules_to_use; by=(k -> usages[k]), rev=true)
+
+    if length(rules_to_use) > max_new_rules
+        return rules_to_use[1:max_new_rules]
+    else
+        return rules_to_use
+    end
 end
 
 """Produce a new grammar which can be used to synthesize new programs with a lesser search depth than before.
@@ -100,31 +136,35 @@ function extend_grammar(examples::Vector{IOExample}, g::AbstractGrammar, sym::Sy
     iterator_provider::Function,
     min_utility=0.0,
     min_size::Int64=nothing,
+    max_enumerations::Int64=nothing,
     splitting_strategy=RandomPick(length(examples) ÷ 3, nothing),
     max_new_rules::Union{Int64, Nothing}=nothing,
     in_place=false,
     mod=Main
     )::AbstractGrammar
 
-    (total_usages, usages) = find_extensions(examples, g, sym,
-        iterator_provider=iterator_provider,
-        min_utility=min_utility,
-        min_size=min_size,
-        splitting_strategy=splitting_strategy,
-        mod=mod
+    (total_usages, usages) = find_extensions(examples, g, sym;
+        iterator_provider,
+        min_utility,
+        min_size,
+        splitting_strategy,
+        max_enumerations,
+        mod,
     )
 
     new_g = if (in_place) g else deepcopy(g) end
 
     rules_added = 0
-    for ruleNode in keys(usages)
+
+    rules_to_use = choose_extensions(total_usages, usages; min_utility, max_new_rules)
+
+    for ruleNode in rules_to_use
         rules_added = rules_added + 1
         if (!isnothing(max_new_rules) && rules_added == max_new_rules) break end
         new_rule_type = g.types[ruleNode.ind]
         new_rule_expr = rulenode2expr(ruleNode, g)
         new_rule = Expr(:(=), new_rule_type, new_rule_expr)
-        println(new_rule)
-        add_rule!(g, new_rule)
+        add_rule!(new_g, new_rule)
     end
 
     return new_g

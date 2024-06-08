@@ -42,10 +42,11 @@ function synth_multiple(
             score = HerbSearch.evaluate(problem, expr, symboltable, shortcircuit=shortcircuit, allow_evaluation_errors=allow_evaluation_errors)
             if score == 1
                 found_program = HerbSearch.freeze_state(candidate_program)
-                println("have done $(i) iterations")
+                println("problem $(problemid) has been solved in $(i) iterations")
                 print("✅")
                 println(expr)
                 println("current time = $(time() - start_time)")
+                println("program size is $(length(candidate_program)) nodes")
                 best_programs[problemid] = (found_program, optimal_program)
                 found += 1
                 if (found >= length(problems)) return best_programs end

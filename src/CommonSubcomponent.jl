@@ -4,6 +4,8 @@ export
   RandomPick,
   Spans
 
+Base.:(==)(A::Hole, B::Hole) = A.domain == B.domain
+
 """Call a function on each subprogram."""
 function visit_rulenode(n::RuleNode, f::Function)
     f(n)
@@ -70,6 +72,9 @@ function hash_common_subcomponents(nodes::Vector{RuleNode}, low = 1, high = leng
     end
 end
 
+find_size_except_holes(node::Hole) = 0
+find_size_except_holes(node::RuleNode) = 1 + sum(map(find_size_except_holes, node.children))
+
 """Get the most useful subcomponents and how often they are used according to a min utility value between 0 and 1"""
 function hash_common_subcomponents_pairwise(g::AbstractGrammar, nodes::Vector{RuleNode};
     min_utility = 0.0,
@@ -77,15 +82,15 @@ function hash_common_subcomponents_pairwise(g::AbstractGrammar, nodes::Vector{Ru
 )
     utilities = convert(Dict{RuleNode, Int64}, Dict())
     total_utility = 0
-    for node1 in nodes
-        for node2 in nodes
-            if (node1 == node2) continue end
-
+    for i in eachindex(nodes)
+        for j in (i + 1):lastindex(nodes)
+            node1 = nodes[i]
+            node2 = nodes[j]
             handle_pair(n1, n2) = begin
                 common = find_common_subtree_with_holes(g, n1, n2)
 
-                if (!isnothing(common) && (isnothing(min_size) || min_size <= length(common)))
-                    c = get(utilities, "common", 0)
+                if (!isnothing(common) && (isnothing(min_size) || min_size <= find_size_except_holes(common)))
+                    c = get(utilities, common, 0)
 
                     utilities[common] = c + 1
                     total_utility += 1
