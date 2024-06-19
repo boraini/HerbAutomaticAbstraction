@@ -1,8 +1,7 @@
-using Herb: RuleNode, AbstractGrammar, Hole
-export
-  Each,
-  RandomPick,
-  Spans
+using Herb: AbstractGrammar, number_of_holes
+
+export 
+  hash_common_subcomponents_pairwise
 
 Base.:(==)(A::Hole, B::Hole) = A.domain == B.domain
 
@@ -75,11 +74,28 @@ end
 find_size_except_holes(node::Hole) = 0
 find_size_except_holes(node::RuleNode) = 1 + sum(map(find_size_except_holes, node.children))
 
-"""Get the most useful subcomponents and how often they are used according to a min utility value between 0 and 1"""
+"""Return true if the holes in the general rule node can be filled from the specific rule node."""
+generalizationof(::AbstractGrammar, general::Hole, specific::Hole)::Bool = general.domain == specific.domain
+generalizationof(::AbstractGrammar, ::RuleNode, ::Hole)::Bool = false
+generalizationof(g::AbstractGrammar, general::Hole, specific::RuleNode)::Bool =
+    g.types[findfirst(general.domain)] == g.types[specific.ind]
+generalizationof(g::AbstractGrammar, general::RuleNode, specific::RuleNode)::Bool =
+    if general.ind == specific.ind
+        zippy = zip(general.children, specific.children)
+        funny(t) = generalizationof(g, t[1], t[2])
+        all(funny, zippy)
+    else
+        false
+    end
+
+"""
+Find each subprogram longer than min_size, possibly with holes, which are encountered at least two times.
+Return a total frequency and a dictionary of frequencies for each subprogram.
+"""
 function hash_common_subcomponents_pairwise(g::AbstractGrammar, nodes::Vector{RuleNode};
-    min_utility = 0.0,
     min_size::Union{Int64, Nothing} = nothing,
-)
+    with_holes=false,
+)::Tuple{Int64, Dict{RuleNode, Int64}}
     utilities = convert(Dict{RuleNode, Int64}, Dict())
     total_utility = 0
     for i in eachindex(nodes)
@@ -87,7 +103,12 @@ function hash_common_subcomponents_pairwise(g::AbstractGrammar, nodes::Vector{Ru
             node1 = nodes[i]
             node2 = nodes[j]
             handle_pair(n1, n2) = begin
-                common = find_common_subtree_with_holes(g, n1, n2)
+                common =
+                    if with_holes
+                        find_common_subtree_with_holes(g, n1, n2)
+                    else
+                        find_common_subtree_without_holes(g, n1, n2)
+                    end
 
                 if (!isnothing(common) && (isnothing(min_size) || min_size <= find_size_except_holes(common)))
                     c = get(utilities, common, 0)
@@ -101,7 +122,37 @@ function hash_common_subcomponents_pairwise(g::AbstractGrammar, nodes::Vector{Ru
         end
     end
 
+    total_utility = 0
+
+    for p in keys(utilities)
+        utilities[p] = max(1, ceil(sqrt(utilities[p])))
+        total_utility += utilities[p]
+    end
+
+    programs = collect(keys(utilities))
+    program_sizes = map(find_size_except_holes, programs)
+    program_indices = collect(eachindex(programs))
+
+    sort!(program_indices; by=(i -> program_sizes[i]))
+
+    for i in eachindex(program_indices)
+        for j in (i + 1):lastindex(program_indices)
+            program_i = programs[program_indices[i]]
+            program_j = programs[program_indices[j]]
+            if generalizationof(g, program_i, program_j)
+                utilities[program_i] += utilities[program_j]
+                total_utility += utilities[program_j]
+            end
+        end
+    end
+
     return (total_utility, utilities)
+end
+
+"""Find the deepest subtree without holes that is common."""
+function find_common_subtree_without_holes(::AbstractGrammar, node1::RuleNode, node2::RuleNode)::Union{RuleNode, Nothing}
+    if (node1 == node2) return node1
+    else return nothing end
 end
 
 """Find the deepest subtree with holes that is common."""

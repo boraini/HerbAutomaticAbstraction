@@ -1,15 +1,15 @@
 export Examples
 
 module Examples
-  include("../examples/Lisp.jl")
-  include("../examples/HammingDistance.jl")
+  include("../examples/util/Util.jl")
   include("../examples/ExtendGrammarExample.jl")
   include("../examples/ListExample.jl")
   include("../examples/stringBenchmark.jl")
+  include("../examples/BitVectorBenchmark.jl")
   
   export
-    Lisp,
     extendGrammarExample,
     listExample,
-    stringBenchmark
+    stringBenchmark,
+    bitVectorBenchmark
 end

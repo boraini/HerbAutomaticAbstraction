@@ -87,7 +87,7 @@ Fitness function for GeneticSearchIterator
 Normally, the genetic search iterator doesn't support custom fitness functions (as if 01/06/2024) but I have made
 some modifications to it. See library_modifications/genetic_search_iterator.jl
 """
-function hamming_fitness(iter, program, results::Vector{<:Tuple{String, Any}})
+function hamming_fitness(results::Vector{<:Tuple{String, Any}})
     global max_supported_string_length
     distances = map(val -> if (val[2] isa String && val[2] != "" && length(val[2]) <= max_supported_string_length)
         hamming_distance(val)

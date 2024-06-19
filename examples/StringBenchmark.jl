@@ -1,135 +1,81 @@
-using HerbBenchmarks.PBE_SLIA_Track_2019
+using HerbBenchmarks.String_transformations_2020
 using HerbConstraints
 using HerbSpecification
 using HerbSearch
 using HerbInterpret
+using HerbBenchmarks
 
-function solve(iterator_to_use, problems::Vector{Problem})
-    iterator = iterator_to_use
-    
-    programs = synth_multiple(problems, iterator, allow_evaluation_errors=true, mod=PBE_SLIA_Track_2019)
-
-    return programs
-end
+string_benchmark_before_iterator_id = generate_iterator_id()
+string_benchmark_after_iterator_id = generate_iterator_id()
 
 function stringBenchmark()
-    g = @csgrammar begin
-        Start = ntString
-        ntString = _arg_1
-        # ntString = ""
-        ntStringDelim = " "
-        ntStringDelim = "."
-        ntStringDelim = ","
-        ntStringDelim = "-"
-        ntStringDelim = "_"
-        ntStringDelim = "/"
-        ntStringDelim = "= "
-        ntStringDelim = "<"
-        ntStringDelim = ">"
-        ntString = substr_cvc(ntString, ntInt, ntInt)
-        # ntString = concat_cvc(ntString, ntString)
-        # ntString = replace_cvc(ntString, ntStringDelim, ntStringDelim)
-        # ntString = at_cvc(ntString, ntInt)
-        # ntString = int_to_str_cvc(ntInt)
-        ntInt = -1
-        ntInt = 0
-        ntInt = 1
-        ntInt = 2
-        # ntInt = 1
-        ntInt = ntInt + ntInt
-        # ntInt = ntInt - ntInt
-        ntInt = len_cvc(ntString)
-        # ntInt = str_to_int_cvc(ntString)
-        # ntInt = ntBool ? ntInt : ntInt
-        ntInt = indexof_cvc(ntString, ntStringDelim, ntInt)
-        ntString = ntBool ? ntString : ntString
-        #ntBool = true
-        #ntBool = false
-        ntBool = _arg_2 == ntInt
-        # ntBool = prefixof_cvc(ntString, ntString)
-        # ntBool = suffixof_cvc(ntString, ntString)
-        ntBool = contains_cvc(ntString, ntStringDelim)
-        # ntInt = val2
-        # ntInt = val3
-        ntStringDelim = ntString # this is just short circuited somehow
-    end
+    g = sygus_2019_grammar
 
-    ruleid_substr = 12
-    ruleid_plus = 17
-
-    # do not chain substr_cvc
-    # addconstraint!(g, Forbidden(
-    #     RuleNode(5, [
-    #         RuleNode(5, [RuleNode(5, [
-    #             RuleNode(5, [RuleNode(5, [
-    #                 RuleNode(5, [VarNode(:a), VarNode(:b), VarNode(:c)])
-    #                 VarNode(:d)
-    #                 VarNode(:e)
-    #             ]), VarNode(:f), VarNode(:g)])
-    #             VarNode(:h)
-    #             VarNode(:i)
-    #         ]), VarNode(:j), VarNode(:k)])
-    #         VarNode(:l)
-    #         VarNode(:m)
-    #     ])
-    # ))
-
-    # do not chain substr_cvc
-    # addconstraint!(g, Forbidden(
-    #     RuleNode(ruleid_substr, [
-    #         RuleNode(ruleid_substr, [VarNode(:a), VarNode(:b), VarNode(:c)])
-    #         VarNode(:d)
-    #         VarNode(:e)
-    #     ])
-    # ))
-
-    # addconstraint!(g, ForbiddenSequence([ruleid_substr, ruleid_substr])) # do not nest substr_cvc
-    addconstraint!(g, ForbiddenSequence([ruleid_plus, ruleid_plus])) # do not chain (+)
-
-    iterator_to_use = BFSIterator(g, :ntString, max_depth=10)
-    iterator_init_state = deepcopy(iterator_to_use.solver.state)
-
-    problems = [
-        # PBE_SLIA_Track_2019.problem_36462127,
-        #PBE_SLIA_Track_2019.problem_extract_text_between_parentheses,
-        PBE_SLIA_Track_2019.problem_extract_word_that_begins_with_specific_character,
-        PBE_SLIA_Track_2019.problem_get_first_name_from_name_with_comma,
-        PBE_SLIA_Track_2019.problem_stackoverflow11,
-        PBE_SLIA_Track_2019.problem_replace_one_character_with_another,
-
-        # original working problems
-        PBE_SLIA_Track_2019.problem_exceljet3,
-        PBE_SLIA_Track_2019.problem_11604909, # substr_cvc(_arg_1, -1 + indexof_cvc(_arg_1, ".", 2), indexof_cvc(_arg_1, ".", 1) + 1)
-        PBE_SLIA_Track_2019.problem_exceljet4 # substr_cvc(_arg_1, indexof_cvc(_arg_1, "/", -1) + 2, len_cvc(_arg_1))
-    ]
-
-    (examples, splitting_strategy) = make_spans_strategy(problems)
+    problems = convert(Vector{Problem}, HerbBenchmarks.all_problems(PBE_SLIA_Track_2019))
 
     printstyled("Extending grammar...\n"; color = :orange)
 
-    new_g = extend_grammar(examples, g, :ntString;
-        iterator_provider=_ -> iterator_to_use,
-        splitting_strategy,
-        min_utility=0.1,
+    iterator_provider(::Any) = reset_iterator(string_benchmark_before_iterator_id, BFSIterator(g, :Start; max_depth=15))
+
+    new_g = extend_grammar(problems, g, :ntString;
+        iterator_provider,
+        utility_function=number_of_holes_as_utility,
+        min_utility=0,
         min_size=4,
         max_new_rules=4,
+        max_enumerations=1_000_000,
+        concurrent=true,
+        in_place=false,
+        with_holes=true,
         mod=PBE_SLIA_Track_2019,
-        max_enumerations=10_000_000,
-        in_place=false
     )
-
-    iterator_to_use.solver.state = deepcopy(iterator_init_state)
 
     printstyled("Trying with the new grammar...\n"; color = :lime)
 
-    second_iterator_to_use = BFSIterator(new_g, :ntString, max_depth=5)
-    second_iterator_init_state = deepcopy(second_iterator_to_use.solver.state)
-
-    solve(second_iterator_to_use, convert(Vector{Problem}, problems))
-
-    second_iterator_to_use.solver.state = deepcopy(second_iterator_init_state)
+    iterator = BFSIterator(new_g, :ntString; max_depth=8)
+    
+    programs = synth_multiple(problems, iterator, allow_evaluation_errors=true, max_enumerations=10_000_000, mod=PBE_SLIA_Track_2019)
 
     # TODO: delete this
+    
+    # problems = convert(Vector{Problem}, [
+    #     PBE_SLIA_Track_2019.problem_34801680,
+    #     PBE_SLIA_Track_2019.problem_exceljet3,
+    #     PBE_SLIA_Track_2019.problem_stackoverflow6,
+    #     PBE_SLIA_Track_2019.problem_phone_5_short,
+    #     PBE_SLIA_Track_2019.problem_28627624_1,
+    #     PBE_SLIA_Track_2019.problem_get_first_name_from_name,
+    #     PBE_SLIA_Track_2019.problem_get_first_word,
+    #     PBE_SLIA_Track_2019.problem_remove_file_extension_from_filename 
+    # ])
+
+    # problems = [
+    #     # PBE_SLIA_Track_2019.problem_36462127,
+    #     #PBE_SLIA_Track_2019.problem_extract_text_between_parentheses,
+    #     PBE_SLIA_Track_2019.problem_extract_word_that_begins_with_specific_character,
+    #     PBE_SLIA_Track_2019.problem_get_first_name_from_name_with_comma,
+    #     PBE_SLIA_Track_2019.problem_stackoverflow11,
+    #     PBE_SLIA_Track_2019.problem_replace_one_character_with_another,
+
+    #     # original working problems
+    #     PBE_SLIA_Track_2019.problem_exceljet3,
+    #     PBE_SLIA_Track_2019.problem_11604909, # substr_cvc(_arg_1, -1 + indexof_cvc(_arg_1, ".", 2), indexof_cvc(_arg_1, ".", 1) + 1)
+    #     PBE_SLIA_Track_2019.problem_exceljet4, # substr_cvc(_arg_1, indexof_cvc(_arg_1, "/", -1) + 2, len_cvc(_arg_1))
+    #     PBE_SLIA_Track_2019.problem_get_last_name_from_name,
+    #     PBE_SLIA_Track_2019.problem_get_first_name_from_name
+    # ]
+
+    # iterator_to_use.solver.state = deepcopy(iterator_init_state)
+
+    # rule1expr = rulenode2expr(RuleNode(19, [RuleNode(2),RuleNode(10),RuleNode(13)]), g)
+    # rule1 = Expr(:(=), :ntInt, rule1expr)
+    # # rule2 = Expr(:(=), :ntString, rulenode2expr(RuleNode(12, [RuleNode(12, [RuleNode(2),RuleNode(16),RuleNode(19, [RuleNode(2),RuleNode(9),RuleNode(16)])]),RuleNode(19, [RuleNode(2),RuleNode(10),RuleNode(13)])RuleNode(15)]), g))
+    # rule3 = Expr(:(=), :ntString, rulenode2expr(RuleNode(12, [RuleNode(2),RuleNode(16),RuleNode(19, [RuleNode(2),RuleNode(9),RuleNode(16)])]), g))
+    # rule4 = Expr(:(=), :ntInt, rulenode2expr(RuleNode(19, [RuleNode(2),RuleNode(9),RuleNode(16)]), g))
+
+    # add_rule!(g, rule1)
+    # add_rule!(g, rule3)
+    # add_rule!(g, rule4)
 
     # println(HerbInterpret.execute_on_input(
     #     SymbolTable(g),
