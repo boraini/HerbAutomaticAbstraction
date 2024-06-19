@@ -26,3 +26,5 @@ Manifest.toml
 # Testing data. Add where to download these to the README instead. If it is original data
 # and just for this project, you can disable this entry temporarily.\
 data/
+
+*.excl

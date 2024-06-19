@@ -14,7 +14,7 @@ function extendGrammarExample()
 
     iterator_provider = problem -> BFSIterator(g, :Number, max_depth = 5)
 
-    extend_grammar(examples, g, :Number,
+    extend_grammar(examples, g, :Number;
         iterator_provider=iterator_provider,
         splitting_strategy=RandomPick(3, nothing),
         min_utility=0.1,

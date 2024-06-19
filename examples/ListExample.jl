@@ -29,7 +29,7 @@ function listExample()
     iterator_to_use = DFSIterator(g, :Number, max_depth = 5)
     iterator_init_state = deepcopy(iterator_to_use.solver.state)
 
-    new_g = extend_grammar(examples, g, :Number, # expect to find head(tail(x)) as an extension
+    new_g = extend_grammar(examples, g, :Number; # expect to find head(tail(x)) as an extension
         iterator_provider=_ -> iterator_to_use,
         splitting_strategy=Spans([3, 3]),
         min_utility=0.3,

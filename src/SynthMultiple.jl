@@ -30,6 +30,8 @@ function synth_multiple(
     best_scores = [0.0 for _ in problems]
     best_programs = convert(Vector{Union{Tuple{RuleNode, SynthResult}, Nothing}}, [nothing for _ in problems])
     found = 0
+
+    my_i = 0
     
     for (i, candidate_program) ∈ enumerate(iterator)
         # Create expression from rulenode representation of AST
@@ -39,17 +41,18 @@ function synth_multiple(
         # Evaluate the expression
         for (problemid, problem) in enumerate(problems)
             if (!isnothing(best_programs[problemid]) && best_programs[problemid][2] == optimal_program) continue end
-            score = HerbSearch.evaluate(problem, expr, symboltable, shortcircuit=shortcircuit, allow_evaluation_errors=allow_evaluation_errors)
+            score = HerbSearch.evaluate(problem, expr, symboltable; shortcircuit, allow_evaluation_errors)
             if score == 1
                 found_program = HerbSearch.freeze_state(candidate_program)
-                println("problem $(problemid) has been solved in $(i) iterations")
+                println("problem $(problem.name) has been solved in $(i) iterations")
                 print("✅")
                 println(expr)
                 println("current time = $(time() - start_time)")
                 println("program size is $(length(candidate_program)) nodes")
                 best_programs[problemid] = (found_program, optimal_program)
                 found += 1
-                if (found >= length(problems)) return best_programs end
+                println("Found: $(found)")
+                if (found >= length(problems)) println("finishing early"); return best_programs end
             elseif score >= best_scores[problemid]
                 best_scores[problemid] = score
                 found_program = HerbSearch.freeze_state(candidate_program)
@@ -57,11 +60,19 @@ function synth_multiple(
             end
         end
 
+        if rem(i, 100_000) == 0
+            println("info: $(i) iterations")
+        end
+
         # Check stopping criteria
         if i > max_enumerations || time() - start_time > max_time
             break;
         end
+
+        my_i = i
     end
+
+    println("in the end done $(my_i) iterations")
 
     # The enumeration exhausted, but an optimal problem was not found
     return best_programs
