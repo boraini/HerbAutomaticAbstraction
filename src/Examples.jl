@@ -8,12 +8,8 @@ module Examples
   include("../examples/BitVectorBenchmark.jl")
   
   export
-    Lisp,
     extendGrammarExample,
     listExample,
-    string2020,
     stringBenchmark,
-    splitExample,
-    UFPhase1,
-    UFPhase1
+    bitVectorBenchmark
 end

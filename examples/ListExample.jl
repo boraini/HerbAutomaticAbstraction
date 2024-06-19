@@ -13,8 +13,6 @@ function listExample()
         List = nil() # 7
         List = cons(Head, List) # 8
     end
-
-    println(rulenode2expr(Hole([false, false, false, true, true, true, true, true]), g))
     
     examples = [
         IOExample(Dict(:x => [2, 4, 10]), 12), # triple the second element
